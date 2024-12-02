@@ -7,7 +7,7 @@ import com.ruoyi.system.domain.AccompanyingTherapist;
  * 陪诊师Service接口
  * 
  * @author ruoyi
- * @date 2024-12-01
+ * @date 2024-12-02
  */
 public interface IAccompanyingTherapistService 
 {

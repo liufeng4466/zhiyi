@@ -12,7 +12,7 @@ import com.ruoyi.system.service.IHospitalService;
  * 医院Service业务层处理
  * 
  * @author ruoyi
- * @date 2024-12-01
+ * @date 2024-12-02
  */
 @Service
 public class HospitalServiceImpl implements IHospitalService 

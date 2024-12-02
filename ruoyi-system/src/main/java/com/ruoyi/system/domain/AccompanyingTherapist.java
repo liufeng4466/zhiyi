@@ -9,29 +9,29 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 陪诊师对象 accompanying_therapist
  * 
  * @author ruoyi
- * @date 2024-12-01
+ * @date 2024-12-02
  */
 public class AccompanyingTherapist extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
+    /** 主键 */
     private Long id;
 
-    /** $column.columnComment */
-    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    /** 姓名 */
+    @Excel(name = "姓名")
     private String name;
 
-    /** $column.columnComment */
-    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    private Integer gender;
+    /** 用户性别（0男 1女 2未知） */
+    @Excel(name = "用户性别", readConverterExp = "0=男,1=女,2=未知")
+    private String gender;
 
-    /** $column.columnComment */
-    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    /** 年龄 */
+    @Excel(name = "年龄")
     private Integer age;
 
-    /** $column.columnComment */
-    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    /** 手机号 */
+    @Excel(name = "手机号")
     private Long phone;
 
     /** 创建人id */
@@ -60,12 +60,12 @@ public class AccompanyingTherapist extends BaseEntity
     {
         return name;
     }
-    public void setGender(Integer gender) 
+    public void setGender(String gender) 
     {
         this.gender = gender;
     }
 
-    public Integer getGender() 
+    public String getGender() 
     {
         return gender;
     }

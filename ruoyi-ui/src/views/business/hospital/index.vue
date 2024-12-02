@@ -9,69 +9,18 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="医院电话" prop="telephone">
-        <el-input
-          v-model="queryParams.telephone"
-          placeholder="请输入医院电话"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="城市名称" prop="city">
+        <el-select v-model="queryParams.city" placeholder="请选择城市" clearable style="width: 240px">
+          <el-option v-for="dict in dict.type.city_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+        </el-select>
       </el-form-item>
-      <el-form-item label="医院地址" prop="address">
-        <el-input
-          v-model="queryParams.address"
-          placeholder="请输入医院地址"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="疾病分类" prop="diseaseType">
+        <el-select v-model="queryParams.diseaseType" placeholder="请选择分类" clearable style="width: 240px">
+          <el-option v-for="dict in dict.type.disease_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+        </el-select>
       </el-form-item>
-      <el-form-item label="医院所在城市主键ID" prop="city">
-        <el-input
-          v-model="queryParams.city"
-          placeholder="请输入医院所在城市主键ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="所在城市名称" prop="cityName">
-        <el-input
-          v-model="queryParams.cityName"
-          placeholder="请输入所在城市名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="经度" prop="lng">
-        <el-input
-          v-model="queryParams.lng"
-          placeholder="请输入经度"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="纬度" prop="lat">
-        <el-input
-          v-model="queryParams.lat"
-          placeholder="请输入纬度"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建人id" prop="createUserId">
-        <el-input
-          v-model="queryParams.createUserId"
-          placeholder="请输入创建人id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="修改人ID" prop="updateUserId">
-        <el-input
-          v-model="queryParams.updateUserId"
-          placeholder="请输入修改人ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="创建时间">
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -127,17 +76,29 @@
 
     <el-table v-loading="loading" :data="hospitalList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键ID" align="center" prop="id" />
+      <el-table-column label="医院编号" align="center" prop="id" />
       <el-table-column label="医院名称" align="center" prop="name" />
       <el-table-column label="医院电话" align="center" prop="telephone" />
       <el-table-column label="医院地址" align="center" prop="address" />
-      <el-table-column label="医院简介" align="center" prop="snapshot" />
-      <el-table-column label="医院所在城市主键ID" align="center" prop="city" />
-      <el-table-column label="所在城市名称" align="center" prop="cityName" />
+      <!-- <el-table-column label="医院简介" align="center" prop="snapshot" /> -->
+      <el-table-column label="城市名称" align="center" prop="city">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.city_type" :value="scope.row.city"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="病分类" align="center" prop="diseaseType">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.disease_type" :value="scope.row.diseaseType"/>
+        </template>
+      </el-table-column>
       <el-table-column label="经度" align="center" prop="lng" />
       <el-table-column label="纬度" align="center" prop="lat" />
-      <el-table-column label="创建人id" align="center" prop="createUserId" />
-      <el-table-column label="修改人ID" align="center" prop="updateUserId" />
+      <el-table-column label="创建时间" align="center" prop="createTime">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建人" align="center" prop="createBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -181,23 +142,21 @@
         <el-form-item label="医院简介" prop="snapshot">
           <el-input v-model="form.snapshot" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="医院所在城市主键ID" prop="city">
-          <el-input v-model="form.city" placeholder="请输入医院所在城市主键ID" />
+        <el-form-item label="城市名称" prop="cityName">
+          <el-select v-model="form.city" placeholder="请选择城市">
+            <el-option v-for="dict in dict.type.city_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="所在城市名称" prop="cityName">
-          <el-input v-model="form.cityName" placeholder="请输入所在城市名称" />
+        <el-form-item label="疾病分类" prop="diseaseType">
+          <el-select v-model="form.diseaseType" placeholder="请选择分类">
+            <el-option v-for="dict in dict.type.disease_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="经度" prop="lng">
+        <el-form-item label="经度(lng)" prop="lng">
           <el-input v-model="form.lng" placeholder="请输入经度" />
         </el-form-item>
-        <el-form-item label="纬度" prop="lat">
+        <el-form-item label="纬度(lat)" prop="lat">
           <el-input v-model="form.lat" placeholder="请输入纬度" />
-        </el-form-item>
-        <el-form-item label="创建人id" prop="createUserId">
-          <el-input v-model="form.createUserId" placeholder="请输入创建人id" />
-        </el-form-item>
-        <el-form-item label="修改人ID" prop="updateUserId">
-          <el-input v-model="form.updateUserId" placeholder="请输入修改人ID" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -213,6 +172,7 @@ import { listHospital, getHospital, delHospital, addHospital, updateHospital } f
 
 export default {
   name: "Hospital",
+  dicts: ['disease_type', 'city_type'],
   data() {
     return {
       // 遮罩层
@@ -229,6 +189,8 @@ export default {
       total: 0,
       // 医院表格数据
       hospitalList: [],
+      // 日期范围
+      dateRange: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -238,15 +200,9 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        telephone: null,
-        address: null,
-        snapshot: null,
         city: null,
-        cityName: null,
-        lng: null,
-        lat: null,
-        createUserId: null,
-        updateUserId: null,
+        createTime: null,
+        diseaseType: null,
       },
       // 表单参数
       form: {},
@@ -262,7 +218,7 @@ export default {
     /** 查询医院列表 */
     getList() {
       this.loading = true;
-      listHospital(this.queryParams).then(response => {
+      listHospital(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.hospitalList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -276,21 +232,15 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        id: null,
+        id:null,
         name: null,
         telephone: null,
         address: null,
         snapshot: null,
         city: null,
-        cityName: null,
         lng: null,
         lat: null,
-        createUserId: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateUserId: null,
-        updateTime: null
+        diseaseType: null,
       };
       this.resetForm("form");
     },
@@ -301,6 +251,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -322,6 +273,7 @@ export default {
       const id = row.id || this.ids
       getHospital(id).then(response => {
         this.form = response.data;
+        console.log("-------",this.form)
         this.open = true;
         this.title = "修改医院";
       });

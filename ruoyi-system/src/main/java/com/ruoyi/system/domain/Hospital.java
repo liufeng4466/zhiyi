@@ -9,7 +9,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 医院对象 hospital
  * 
  * @author ruoyi
- * @date 2024-12-01
+ * @date 2024-12-02
  */
 public class Hospital extends BaseEntity
 {
@@ -35,12 +35,8 @@ public class Hospital extends BaseEntity
     private String snapshot;
 
     /** 医院所在城市主键ID */
-    @Excel(name = "医院所在城市主键ID")
-    private Long city;
-
-    /** 所在城市名称 */
-    @Excel(name = "所在城市名称")
-    private String cityName;
+    @Excel(name = "医院所在城市")
+    private String city;
 
     /** 经度 */
     @Excel(name = "经度")
@@ -49,6 +45,10 @@ public class Hospital extends BaseEntity
     /** 纬度 */
     @Excel(name = "纬度")
     private String lat;
+
+    /** 病分类 */
+    @Excel(name = "病分类")
+    private String diseaseType;
 
     /** 创建人id */
     @Excel(name = "创建人id")
@@ -103,25 +103,17 @@ public class Hospital extends BaseEntity
     {
         return snapshot;
     }
-    public void setCity(Long city) 
+    public void setCity(String city)
     {
         this.city = city;
     }
 
-    public Long getCity() 
+    public String getCity()
     {
         return city;
     }
-    public void setCityName(String cityName) 
-    {
-        this.cityName = cityName;
-    }
 
-    public String getCityName() 
-    {
-        return cityName;
-    }
-    public void setLng(String lng) 
+    public void setLng(String lng)
     {
         this.lng = lng;
     }
@@ -138,6 +130,15 @@ public class Hospital extends BaseEntity
     public String getLat() 
     {
         return lat;
+    }
+    public void setDiseaseType(String diseaseType) 
+    {
+        this.diseaseType = diseaseType;
+    }
+
+    public String getDiseaseType() 
+    {
+        return diseaseType;
     }
     public void setCreateUserId(Long createUserId) 
     {
@@ -167,9 +168,9 @@ public class Hospital extends BaseEntity
             .append("address", getAddress())
             .append("snapshot", getSnapshot())
             .append("city", getCity())
-            .append("cityName", getCityName())
             .append("lng", getLng())
             .append("lat", getLat())
+            .append("diseaseType", getDiseaseType())
             .append("createUserId", getCreateUserId())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())

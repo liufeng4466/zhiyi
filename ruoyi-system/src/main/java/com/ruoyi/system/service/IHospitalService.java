@@ -7,7 +7,7 @@ import com.ruoyi.system.domain.Hospital;
  * 医院Service接口
  * 
  * @author ruoyi
- * @date 2024-12-01
+ * @date 2024-12-02
  */
 public interface IHospitalService 
 {
