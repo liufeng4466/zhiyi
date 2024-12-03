@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.Hospital;
+import com.ruoyi.system.domain.SysPost;
 
 /**
  * 医院Service接口
@@ -26,6 +27,13 @@ public interface IHospitalService
      * @return 医院集合
      */
     public List<Hospital> selectHospitalList(Hospital hospital);
+
+    /**
+     * 查询所有医院
+     *
+     * @return 医院列表
+     */
+    public List<Hospital> selectHospitalAll();
 
     /**
      * 新增医院

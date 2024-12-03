@@ -45,6 +45,17 @@ public class HospitalServiceImpl implements IHospitalService
     }
 
     /**
+     * 查询所有医院
+     *
+     * @return 医院
+     */
+    @Override
+    public List<Hospital> selectHospitalAll()
+    {
+        return hospitalMapper.selectHospitalAll();
+    }
+
+    /**
      * 新增医院
      * 
      * @param hospital 医院

@@ -26,12 +26,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectDepartmentVo"/>
         <where>  
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="snapshot != null  and snapshot != ''"> and snapshot = #{snapshot}</if>
             <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
-            <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
-            <if test="createUserId != null "> and create_user_id = #{createUserId}</if>
-            <if test="updateUserId != null "> and update_user_id = #{updateUserId}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
         </where>
+    </select>
+
+    <select id="selectDepartmentAll" resultMap="DepartmentResult">
+        <include refid="selectDepartmentVo"/>
     </select>
     
     <select id="selectDepartmentById" parameterType="Long" resultMap="DepartmentResult">
@@ -47,12 +53,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="snapshot != null">snapshot,</if>
             <if test="hospitalId != null">hospital_id,</if>
             <if test="hospitalName != null">hospital_name,</if>
-            <if test="createUserId != null">create_user_id,</if>
             <if test="createBy != null">create_by,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="updateBy != null">update_by,</if>
-            <if test="updateUserId != null">update_user_id,</if>
-            <if test="updateTime != null">update_time,</if>
+            create_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -60,12 +62,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="snapshot != null">#{snapshot},</if>
             <if test="hospitalId != null">#{hospitalId},</if>
             <if test="hospitalName != null">#{hospitalName},</if>
-            <if test="createUserId != null">#{createUserId},</if>
             <if test="createBy != null">#{createBy},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="updateBy != null">#{updateBy},</if>
-            <if test="updateUserId != null">#{updateUserId},</if>
-            <if test="updateTime != null">#{updateTime},</if>
+            sysdate()
          </trim>
     </insert>
 
@@ -76,12 +74,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="snapshot != null">snapshot = #{snapshot},</if>
             <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
             <if test="hospitalName != null">hospital_name = #{hospitalName},</if>
-            <if test="createUserId != null">create_user_id = #{createUserId},</if>
-            <if test="createBy != null">create_by = #{createBy},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
-            <if test="updateUserId != null">update_user_id = #{updateUserId},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
+            update_time = sysdate()
         </trim>
         where id = #{id}
     </update>

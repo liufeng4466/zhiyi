@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="85px">
       <el-form-item label="医生姓名" prop="name">
         <el-input
           v-model="queryParams.name"
@@ -17,37 +17,13 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="科室ID" prop="departmentId">
-        <el-input
-          v-model="queryParams.departmentId"
-          placeholder="请输入科室ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="科室名称" prop="departmentName">
-        <el-input
-          v-model="queryParams.departmentName"
-          placeholder="请输入科室名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-select v-model="queryParams.departmentId" filterable placeholder="请选择科室" clearable style="width: 240px">
+            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
       </el-form-item>
-      <el-form-item label="创建人id" prop="createUserId">
-        <el-input
-          v-model="queryParams.createUserId"
-          placeholder="请输入创建人id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="修改人ID" prop="updateUserId">
-        <el-input
-          v-model="queryParams.updateUserId"
-          placeholder="请输入修改人ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="创建时间">
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -103,14 +79,17 @@
 
     <el-table v-loading="loading" :data="doctorList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主建ID" align="center" prop="id" />
+      <el-table-column label="医生编号" align="center" prop="id" />
       <el-table-column label="医生姓名" align="center" prop="name" />
       <el-table-column label="医生手机号" align="center" prop="phone" />
-      <el-table-column label="医生简介" align="center" prop="snapshot" />
-      <el-table-column label="科室ID" align="center" prop="departmentId" />
+      <!-- <el-table-column label="医生简介" align="center" prop="snapshot" /> -->
       <el-table-column label="科室名称" align="center" prop="departmentName" />
-      <el-table-column label="创建人id" align="center" prop="createUserId" />
-      <el-table-column label="修改人ID" align="center" prop="updateUserId" />
+      <el-table-column label="创建时间" align="center" prop="createTime">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建人" align="center" prop="createBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -141,7 +120,7 @@
 
     <!-- 添加或修改医生对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="85px">
         <el-form-item label="医生姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入医生姓名" />
         </el-form-item>
@@ -151,17 +130,10 @@
         <el-form-item label="医生简介" prop="snapshot">
           <el-input v-model="form.snapshot" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="科室ID" prop="departmentId">
-          <el-input v-model="form.departmentId" placeholder="请输入科室ID" />
-        </el-form-item>
         <el-form-item label="科室名称" prop="departmentName">
-          <el-input v-model="form.departmentName" placeholder="请输入科室名称" />
-        </el-form-item>
-        <el-form-item label="创建人id" prop="createUserId">
-          <el-input v-model="form.createUserId" placeholder="请输入创建人id" />
-        </el-form-item>
-        <el-form-item label="修改人ID" prop="updateUserId">
-          <el-input v-model="form.updateUserId" placeholder="请输入修改人ID" />
+          <el-select v-model="form.departmentId" ref="departmentSelect" filterable placeholder="请选择科室" clearable style="width: 240px">
+            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -174,6 +146,7 @@
 
 <script>
 import { listDoctor, getDoctor, delDoctor, addDoctor, updateDoctor } from "@/api/business/doctor";
+import { departmentselect} from "@/api/business/department";
 
 export default {
   name: "Doctor",
@@ -193,6 +166,10 @@ export default {
       total: 0,
       // 医生表格数据
       doctorList: [],
+      // 医生表格数据
+      departmentList: [],
+       // 日期范围
+       dateRange: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -206,8 +183,7 @@ export default {
         snapshot: null,
         departmentId: null,
         departmentName: null,
-        createUserId: null,
-        updateUserId: null,
+        createTime: null,
       },
       // 表单参数
       form: {},
@@ -216,6 +192,9 @@ export default {
       }
     };
   },
+  mounted(){
+    this.getDepartmentlist();
+  },
   created() {
     this.getList();
   },
@@ -223,10 +202,16 @@ export default {
     /** 查询医生列表 */
     getList() {
       this.loading = true;
-      listDoctor(this.queryParams).then(response => {
+      listDoctor(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.doctorList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+     /** 获取科室选择框列表 */
+     getDepartmentlist(){
+      departmentselect().then(response => {
+        this.departmentList = response.data;
       });
     },
     // 取消按钮
@@ -243,12 +228,6 @@ export default {
         snapshot: null,
         departmentId: null,
         departmentName: null,
-        createUserId: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateUserId: null,
-        updateTime: null
       };
       this.resetForm("form");
     },
@@ -259,6 +238,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -288,6 +268,7 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          this.form.departmentName = this.$refs.departmentSelect.selected.label
           if (this.form.id != null) {
             updateDoctor(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");

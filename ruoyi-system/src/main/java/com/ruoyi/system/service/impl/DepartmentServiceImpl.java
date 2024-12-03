@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.system.domain.Hospital;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.DepartmentMapper;
@@ -42,6 +43,17 @@ public class DepartmentServiceImpl implements IDepartmentService
     public List<Department> selectDepartmentList(Department department)
     {
         return departmentMapper.selectDepartmentList(department);
+    }
+
+    /**
+     * 查询所有科室
+     *
+     * @return 科室
+     */
+    @Override
+    public List<Department> selectDepartmentAll()
+    {
+        return departmentMapper.selectDepartmentAll();
     }
 
     /**

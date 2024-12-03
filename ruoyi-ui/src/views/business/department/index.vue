@@ -9,37 +9,13 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="医院ID" prop="hospitalId">
-        <el-input
-          v-model="queryParams.hospitalId"
-          placeholder="请输入医院ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="医院名称" prop="hospitalName">
-        <el-input
-          v-model="queryParams.hospitalName"
-          placeholder="请输入医院名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-select v-model="queryParams.hospitalId" filterable placeholder="请选择医院" clearable style="width: 240px">
+          <el-option v-for="item in hospitalList" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
       </el-form-item>
-      <el-form-item label="创建人id" prop="createUserId">
-        <el-input
-          v-model="queryParams.createUserId"
-          placeholder="请输入创建人id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="修改人ID" prop="updateUserId">
-        <el-input
-          v-model="queryParams.updateUserId"
-          placeholder="请输入修改人ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="创建时间">
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -95,13 +71,16 @@
 
     <el-table v-loading="loading" :data="departmentList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键ID" align="center" prop="id" />
+      <el-table-column label="科室编号" align="center" prop="id" />
       <el-table-column label="科室名称" align="center" prop="name" />
-      <el-table-column label="科室简介" align="center" prop="snapshot" />
-      <el-table-column label="医院ID" align="center" prop="hospitalId" />
+      <!-- <el-table-column label="科室简介" align="center" prop="snapshot" /> -->
       <el-table-column label="医院名称" align="center" prop="hospitalName" />
-      <el-table-column label="创建人id" align="center" prop="createUserId" />
-      <el-table-column label="修改人ID" align="center" prop="updateUserId" />
+      <el-table-column label="创建时间" align="center" prop="createTime">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建人" align="center" prop="createBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -139,17 +118,10 @@
         <el-form-item label="科室简介" prop="snapshot">
           <el-input v-model="form.snapshot" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="医院ID" prop="hospitalId">
-          <el-input v-model="form.hospitalId" placeholder="请输入医院ID" />
-        </el-form-item>
         <el-form-item label="医院名称" prop="hospitalName">
-          <el-input v-model="form.hospitalName" placeholder="请输入医院名称" />
-        </el-form-item>
-        <el-form-item label="创建人id" prop="createUserId">
-          <el-input v-model="form.createUserId" placeholder="请输入创建人id" />
-        </el-form-item>
-        <el-form-item label="修改人ID" prop="updateUserId">
-          <el-input v-model="form.updateUserId" placeholder="请输入修改人ID" />
+          <el-select v-model="form.hospitalId" ref="hospitalSelect" filterable placeholder="请选择医院" clearable style="width: 240px">
+            <el-option v-for="item in hospitalList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -162,6 +134,7 @@
 
 <script>
 import { listDepartment, getDepartment, delDepartment, addDepartment, updateDepartment } from "@/api/business/department";
+import { hospitalselect} from "@/api/business/hospital";
 
 export default {
   name: "Department",
@@ -181,20 +154,21 @@ export default {
       total: 0,
       // 科室表格数据
       departmentList: [],
+      // 医院表格数据
+      hospitalList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
+      // 日期范围
+      dateRange: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        snapshot: null,
         hospitalId: null,
-        hospitalName: null,
-        createUserId: null,
-        updateUserId: null,
+        createTime: null,
       },
       // 表单参数
       form: {},
@@ -203,6 +177,9 @@ export default {
       }
     };
   },
+  mounted(){
+    this.getHospitallist();
+  },
   created() {
     this.getList();
   },
@@ -210,10 +187,16 @@ export default {
     /** 查询科室列表 */
     getList() {
       this.loading = true;
-      listDepartment(this.queryParams).then(response => {
+      listDepartment(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.departmentList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    /** 获取医院选择框列表 */
+    getHospitallist(){
+      hospitalselect().then(response => {
+        this.hospitalList = response.data;
       });
     },
     // 取消按钮
@@ -228,13 +211,7 @@ export default {
         name: null,
         snapshot: null,
         hospitalId: null,
-        hospitalName: null,
-        createUserId: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateUserId: null,
-        updateTime: null
+        hospitalName:null
       };
       this.resetForm("form");
     },
@@ -245,6 +222,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -274,6 +252,7 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          this.form.hospitalName = this.$refs.hospitalSelect.selected.label
           if (this.form.id != null) {
             updateDepartment(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");

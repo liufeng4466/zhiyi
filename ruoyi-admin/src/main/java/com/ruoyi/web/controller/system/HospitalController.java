@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.system.domain.SysPost;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +46,16 @@ public class HospitalController extends BaseController
         startPage();
         List<Hospital> list = hospitalService.selectHospitalList(hospital);
         return getDataTable(list);
+    }
+
+    /**
+     * 获取医院选择框列表
+     */
+    @GetMapping("/hospitalselect")
+    public AjaxResult hospitalselect()
+    {
+        List<Hospital> hospitals = hospitalService.selectHospitalAll();
+        return success(hospitals);
     }
 
     /**

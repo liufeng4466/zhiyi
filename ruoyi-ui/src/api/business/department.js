@@ -9,6 +9,14 @@ export function listDepartment(query) {
   })
 }
 
+// 获取科室选择框列表
+export function departmentselect() {
+  return request({
+    url: '/system/department/departmentselect',
+    method: 'get'
+  })
+}
+
 // 查询科室详细
 export function getDepartment(id) {
   return request({

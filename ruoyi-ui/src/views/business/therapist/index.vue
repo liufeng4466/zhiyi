@@ -1,53 +1,37 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="${comment}" prop="name">
+      <el-form-item label="姓名" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入${comment}"
+          placeholder="请输入姓名"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="${comment}" prop="gender">
-        <el-input
-          v-model="queryParams.gender"
-          placeholder="请输入${comment}"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="用户性别" prop="gender">
+        <el-select v-model="queryParams.gender" placeholder="请选择性别">
+          <el-option v-for="dict in dict.type.sys_user_sex" :key="dict.value" :label="dict.label" :value="dict.value"></el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="${comment}" prop="age">
+      <el-form-item label="年龄" prop="age">
         <el-input
           v-model="queryParams.age"
-          placeholder="请输入${comment}"
+          placeholder="请输入年龄"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="${comment}" prop="phone">
+      <el-form-item label="手机号" prop="phone">
         <el-input
           v-model="queryParams.phone"
-          placeholder="请输入${comment}"
+          placeholder="请输入手机号"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="创建人id" prop="createUserId">
-        <el-input
-          v-model="queryParams.createUserId"
-          placeholder="请输入创建人id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="修改人ID" prop="updateUserId">
-        <el-input
-          v-model="queryParams.updateUserId"
-          placeholder="请输入修改人ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="创建时间">
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -103,13 +87,21 @@
 
     <el-table v-loading="loading" :data="therapistList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="${comment}" align="center" prop="id" />
-      <el-table-column label="${comment}" align="center" prop="name" />
-      <el-table-column label="${comment}" align="center" prop="gender" />
-      <el-table-column label="${comment}" align="center" prop="age" />
-      <el-table-column label="${comment}" align="center" prop="phone" />
-      <el-table-column label="创建人id" align="center" prop="createUserId" />
-      <el-table-column label="修改人ID" align="center" prop="updateUserId" />
+      <el-table-column label="编号" align="center" prop="id" />
+      <el-table-column label="姓名" align="center" prop="name" />
+      <el-table-column label="用户性别" align="center" prop="gender">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.sys_user_sex" :value="scope.row.gender"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="年龄" align="center" prop="age" />
+      <el-table-column label="手机号" align="center" prop="phone" />
+      <el-table-column label="创建时间" align="center" prop="createTime">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建人" align="center" prop="createBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -141,23 +133,19 @@
     <!-- 添加或修改陪诊师对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="${comment}" prop="name">
-          <el-input v-model="form.name" placeholder="请输入${comment}" />
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="form.name" placeholder="请输入姓名" />
         </el-form-item>
-        <el-form-item label="${comment}" prop="gender">
-          <el-input v-model="form.gender" placeholder="请输入${comment}" />
+        <el-form-item label="用户性别" prop="gender">
+          <el-select v-model="form.gender" placeholder="请选择性别">
+          <el-option v-for="dict in dict.type.sys_user_sex" :key="dict.value" :label="dict.label" :value="dict.value"></el-option>
+        </el-select>
         </el-form-item>
-        <el-form-item label="${comment}" prop="age">
-          <el-input v-model="form.age" placeholder="请输入${comment}" />
+        <el-form-item label="年龄" prop="age">
+          <el-input v-model="form.age" placeholder="请输入年龄" />
         </el-form-item>
-        <el-form-item label="${comment}" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入${comment}" />
-        </el-form-item>
-        <el-form-item label="创建人id" prop="createUserId">
-          <el-input v-model="form.createUserId" placeholder="请输入创建人id" />
-        </el-form-item>
-        <el-form-item label="修改人ID" prop="updateUserId">
-          <el-input v-model="form.updateUserId" placeholder="请输入修改人ID" />
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="form.phone" placeholder="请输入手机号" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -173,6 +161,7 @@ import { listTherapist, getTherapist, delTherapist, addTherapist, updateTherapis
 
 export default {
   name: "Therapist",
+  dicts: ['sys_user_sex'],
   data() {
     return {
       // 遮罩层
@@ -189,6 +178,8 @@ export default {
       total: 0,
       // 陪诊师表格数据
       therapistList: [],
+       // 日期范围
+       dateRange: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -201,8 +192,7 @@ export default {
         gender: null,
         age: null,
         phone: null,
-        createUserId: null,
-        updateUserId: null,
+        createTime: null,
       },
       // 表单参数
       form: {},
@@ -218,7 +208,7 @@ export default {
     /** 查询陪诊师列表 */
     getList() {
       this.loading = true;
-      listTherapist(this.queryParams).then(response => {
+      listTherapist(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.therapistList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -237,12 +227,6 @@ export default {
         gender: null,
         age: null,
         phone: null,
-        createUserId: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateUserId: null,
-        updateTime: null
       };
       this.resetForm("form");
     },
@@ -253,6 +237,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },

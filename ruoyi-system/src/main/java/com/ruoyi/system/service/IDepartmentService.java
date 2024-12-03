@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.Department;
+import com.ruoyi.system.domain.Hospital;
 
 /**
  * 科室Service接口
@@ -26,6 +27,13 @@ public interface IDepartmentService
      * @return 科室集合
      */
     public List<Department> selectDepartmentList(Department department);
+
+    /**
+     * 查询所有科室
+     *
+     * @return 科室列表
+     */
+    public List<Department> selectDepartmentAll();
 
     /**
      * 新增科室

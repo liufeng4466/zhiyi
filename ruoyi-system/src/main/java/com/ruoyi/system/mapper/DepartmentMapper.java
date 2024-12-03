@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.Department;
+import com.ruoyi.system.domain.Hospital;
 
 /**
  * 科室Mapper接口
@@ -26,6 +27,13 @@ public interface DepartmentMapper
      * @return 科室集合
      */
     public List<Department> selectDepartmentList(Department department);
+
+    /**
+     * 查询所有科室
+     *
+     * @return 岗位列表
+     */
+    public List<Department> selectDepartmentAll();
 
     /**
      * 新增科室

@@ -77,6 +77,7 @@ public class AccompanyingTherapistController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody AccompanyingTherapist accompanyingTherapist)
     {
+        accompanyingTherapist.setCreateBy(getUsername());
         return toAjax(accompanyingTherapistService.insertAccompanyingTherapist(accompanyingTherapist));
     }
 
@@ -88,6 +89,7 @@ public class AccompanyingTherapistController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody AccompanyingTherapist accompanyingTherapist)
     {
+        accompanyingTherapist.setUpdateBy(getUsername());
         return toAjax(accompanyingTherapistService.updateAccompanyingTherapist(accompanyingTherapist));
     }
 

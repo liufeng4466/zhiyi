@@ -17,6 +17,14 @@ export function getHospital(id) {
   })
 }
 
+// 获取医院选择框列表
+export function hospitalselect() {
+  return request({
+    url: '/system/hospital/hospitalselect',
+    method: 'get'
+  })
+}
+
 // 新增医院
 export function addHospital(data) {
   return request({

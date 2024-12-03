@@ -41,6 +41,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
         </where>
     </select>
+
+    <select id="selectHospitalAll" resultMap="HospitalResult">
+        <include refid="selectHospitalVo"/>
+    </select>
     
     <select id="selectHospitalById" parameterType="Long" resultMap="HospitalResult">
         <include refid="selectHospitalVo"/>

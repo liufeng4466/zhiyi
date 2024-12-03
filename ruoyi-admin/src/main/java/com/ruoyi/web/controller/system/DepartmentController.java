@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.system.domain.Hospital;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +49,16 @@ public class DepartmentController extends BaseController
     }
 
     /**
+     * 获取科室选择框列表
+     */
+    @GetMapping("/departmentselect")
+    public AjaxResult departmentselect()
+    {
+        List<Department> departments = departmentService.selectDepartmentAll();
+        return success(departments);
+    }
+
+    /**
      * 导出科室列表
      */
     @PreAuthorize("@ss.hasPermi('system:department:export')")
@@ -77,6 +89,7 @@ public class DepartmentController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody Department department)
     {
+        department.setCreateBy(getUsername());
         return toAjax(departmentService.insertDepartment(department));
     }
 
@@ -88,6 +101,7 @@ public class DepartmentController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody Department department)
     {
+        department.setUpdateBy(getUsername());
         return toAjax(departmentService.updateDepartment(department));
     }
 

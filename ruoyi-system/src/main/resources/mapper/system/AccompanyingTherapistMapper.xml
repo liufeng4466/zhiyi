@@ -29,8 +29,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="gender != null  and gender != ''"> and gender = #{gender}</if>
             <if test="age != null "> and age = #{age}</if>
             <if test="phone != null "> and phone = #{phone}</if>
-            <if test="createUserId != null "> and create_user_id = #{createUserId}</if>
-            <if test="updateUserId != null "> and update_user_id = #{updateUserId}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
         </where>
     </select>
     
@@ -47,12 +51,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="gender != null">gender,</if>
             <if test="age != null">age,</if>
             <if test="phone != null">phone,</if>
-            <if test="createUserId != null">create_user_id,</if>
             <if test="createBy != null">create_by,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="updateBy != null">update_by,</if>
-            <if test="updateUserId != null">update_user_id,</if>
-            <if test="updateTime != null">update_time,</if>
+            create_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -60,12 +60,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="gender != null">#{gender},</if>
             <if test="age != null">#{age},</if>
             <if test="phone != null">#{phone},</if>
-            <if test="createUserId != null">#{createUserId},</if>
             <if test="createBy != null">#{createBy},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="updateBy != null">#{updateBy},</if>
-            <if test="updateUserId != null">#{updateUserId},</if>
-            <if test="updateTime != null">#{updateTime},</if>
+            sysdate()
          </trim>
     </insert>
 
@@ -76,12 +72,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="gender != null">gender = #{gender},</if>
             <if test="age != null">age = #{age},</if>
             <if test="phone != null">phone = #{phone},</if>
-            <if test="createUserId != null">create_user_id = #{createUserId},</if>
-            <if test="createBy != null">create_by = #{createBy},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
-            <if test="updateUserId != null">update_user_id = #{updateUserId},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
+            update_time = sysdate()
         </trim>
         where id = #{id}
     </update>

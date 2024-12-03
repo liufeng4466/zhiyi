@@ -77,6 +77,7 @@ public class DoctorController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody Doctor doctor)
     {
+        doctor.setCreateBy(getUsername());
         return toAjax(doctorService.insertDoctor(doctor));
     }
 
@@ -88,6 +89,7 @@ public class DoctorController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody Doctor doctor)
     {
+        doctor.setUpdateBy(getUsername());
         return toAjax(doctorService.updateDoctor(doctor));
     }
 

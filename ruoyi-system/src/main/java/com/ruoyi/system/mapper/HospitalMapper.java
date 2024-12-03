@@ -28,6 +28,13 @@ public interface HospitalMapper
     public List<Hospital> selectHospitalList(Hospital hospital);
 
     /**
+     * 查询所有医院
+     *
+     * @return 医院列表
+     */
+    public List<Hospital> selectHospitalAll();
+
+    /**
      * 新增医院
      * 
      * @param hospital 医院
